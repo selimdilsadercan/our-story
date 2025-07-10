@@ -12,7 +12,6 @@ import { ChevronRight, Trophy, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { Badge } from './ui/badge';
 
 type ConversationDisplayProps = {
   item: ConversationItem;
@@ -23,6 +22,7 @@ type ConversationDisplayProps = {
 
 let dialogueSynth: Tone.Synth;
 let achievementPlayer: Tone.Player;
+let achievementSoundReady = false;
 
 export function ConversationDisplay({ item, onNext, onBack, canGoBack }: ConversationDisplayProps) {
   const [showNextButton, setShowNextButton] = useState(false);
@@ -41,7 +41,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
   const speakerInfo = currentSpeakerId ? characters[currentSpeakerId] : null;
 
   const playAchievementSound = useCallback(() => {
-    if (achievementPlayer && Tone.context.state === 'running') {
+    if (achievementSoundReady && achievementPlayer && Tone.context.state === 'running') {
       achievementPlayer.start();
     }
   }, []);
@@ -64,10 +64,14 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
   }, [hasAchievement, achievementText, playAchievementSound, toast]);
 
   const playSound = useCallback(() => {
-    if (dialogueSynth && Tone.context.state === 'running') {
-      dialogueSynth.triggerAttackRelease('C#5', '32n');
+    if (!isDialogue && !textToDisplay.includes(' ')) return; // Don't play sound for single word situations like narrator text.
+
+    if (isDialogue || item.type === 'situation') {
+      if (dialogueSynth && Tone.context.state === 'running') {
+        dialogueSynth.triggerAttackRelease('C#5', '32n');
+      }
     }
-  }, []);
+  }, [isDialogue, item.type, textToDisplay]);
 
   const { displayedText, start: startTyping, complete: completeTyping } = useTypingEffect({
     textToType: textToDisplay,
@@ -87,6 +91,9 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
       achievementPlayer = new Tone.Player({
         url: "https://cdn.pixabay.com/audio/2022/03/15/audio_2b2333414b.mp3",
         autostart: false,
+        onload: () => {
+          achievementSoundReady = true;
+        },
       }).toDestination();
     }
     
@@ -149,14 +156,6 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
             ) : (
                 <div>
                     <p className="italic text-muted-foreground text-lg leading-snug font-body min-h-[100px] p-4">{displayedText}</p>
-                    {hasAchievement && showNextButton && (
-                        <div className="flex justify-center -mt-4">
-                            <Badge variant="outline" className="border-yellow-400 text-yellow-500 bg-yellow-400/10 animate-fade-in">
-                                <Trophy className="w-4 h-4 mr-2"/>
-                                {achievementText.trim()}
-                            </Badge>
-                        </div>
-                    )}
                 </div>
             )}
           </CardContent>
