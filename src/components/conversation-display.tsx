@@ -128,6 +128,8 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
     <div className="w-full flex flex-col p-2 md:p-4 animate-fade-in space-y-4">
       <div className="relative flex-1 flex items-end justify-center h-48 md:h-64">
         {Object.values(characters).map((char) => {
+            if (char.id === 'isil') return null; // Do not show Işıl's image
+
             const isSpeaking = char.id === currentSpeakerId;
             const isPresentInScene = presentCharacters.includes(char.id);
 
@@ -136,8 +138,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
                   isSpeaking ? "transform scale-110 z-10" : "transform scale-90 opacity-70",
                   !isPresentInScene && 'opacity-0 scale-50 -translate-y-10',
                   char.id === 'selim' && '-translate-x-1/3',
-                  char.id === 'nurmelek' && 'translate-x-1/3',
-                  char.id === 'isil' && 'translate-x-0' // Centered when alone
+                  char.id === 'nurmelek' && 'translate-x-1/3'
               )}>
                 <Image
                   src={char.image}
