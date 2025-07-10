@@ -39,7 +39,11 @@ export const characters: Record<Character['id'], Character> = {
 
 export const conversations: ConversationScene[] = [
     {
-        situation: "Ortak arkadaşları Işıl'la birlikte yemekhaneye gelen Selim ve Nurmelek tanışırlar. Arkadaş grubu içinde ilk muhabbetler yapılır. Nurmelek, Işıl'dan Selim'in telefon numarasını alır.",
+        situation: "Ortak arkadaşları Işıl'la birlikte yemekhaneye gelen Selim ve Nurmelek tanışırlar, arkadaş grubu içinde ilk muhabbetler yapılır.",
+        dialogue: []
+    },
+    {
+        situation: "Nurmelek, Işıl'dan Selim'in telefon numarasını alır.",
         dialogue: [
             { speaker: 'nurmelek', line: "Kanzi seslide misin ders çalışalım birlikte," },
             { speaker: 'selim', line: "Olur usta gel çalışalım." }
@@ -53,7 +57,15 @@ export const conversations: ConversationScene[] = [
         ]
     },
     {
-        situation: "Nurmelek, Selim'in soruları çözmesine yardımcı olur, birlikte ders çalışmaya devam ederler. Vize zamanı birlikte ders çalışırlar sürekli. Ders aralarında ve diğer zamanlarda sık sık zaman geçirirler, yemekhaneye hep birlikte giderler, çayı hep birlikte içerler.",
+        situation: "Nurmelek, Selim'in soruları çözmesine yardımcı olur, birlikte ders çalışmaya devam ederler.",
+        dialogue: []
+    },
+    {
+        situation: "Vize zamanı birlikte ders çalışırlar sürekli.",
+        dialogue: []
+    },
+    {
+        situation: "Ders aralarında ve diğer zamanlarda sık sık zaman geçirirler, yemekhaneye hep birlikte giderler, çayı hep birlikte içerler.",
         dialogue: [
             { speaker: 'nurmelek', line: "Senle güzel çalışabiliyoruz he, ekipte en iyi ders çalışan sen olabilirsin." }
         ]
@@ -67,7 +79,11 @@ export const conversations: ConversationScene[] = [
         ]
     },
     {
-        situation: "Birlikte filmler izlemeye başlarlar. Film izlerken Selim elini Nurmelek'in omzuna atar. Başarım: İlk temaslar!",
+        situation: "Birlikte filmler izlemeye başlarlar.",
+        dialogue: []
+    },
+    {
+        situation: "Film izlerken Selim elini Nurmelek'in omzuna atar. Başarım: İlk temaslar!",
         dialogue: []
     },
     {
@@ -75,7 +91,11 @@ export const conversations: ConversationScene[] = [
         dialogue: []
     },
     {
-        situation: "Birlikte diziler izlemeye başlarlar. Selim sınavı yokken Nurmelek'i beklemek için yanında kitap okur, kitabı bitince Nurmelek'in kucağına uzanıp reels izlemeye başlar, Nurmelek şaşırır, Nurmelek Selim'in saçını okşayarak ders çalışmaya devam eder, Selim şaşırır.",
+        situation: "Birlikte diziler izlemeye başlarlar.",
+        dialogue: []
+    },
+    {
+        situation: "Selim sınavı yokken Nurmelek'i beklemek için yanında kitap okur, kitabı bitince Nurmelek'in kucağına uzanıp reels izlemeye başlar, Nurmelek şaşırır. Nurmelek Selim'in saçını okşayarak ders çalışmaya devam eder, Selim şaşırır.",
         dialogue: []
     },
     {
@@ -132,7 +152,11 @@ export const conversations: ConversationScene[] = [
         ]
     },
     {
-        situation: "Garip şekilde devam ederler. Vize zamanı tekrardan birlikte çalışmaya başlarlar.",
+        situation: "Garip şekilde devam ederler.",
+        dialogue: []
+    },
+    {
+        situation: "Vize zamanı tekrardan birlikte çalışmaya başlarlar.",
         dialogue: []
     },
     {
@@ -151,7 +175,7 @@ export const conversations: ConversationScene[] = [
         situation: "Selim bu ramazan günlerinden birinde Nurmelek'e çeşitli sorular sormaya başlar.",
         dialogue: [
             { speaker: 'selim', line: "Hoşlandığın tip nedir?" },
-            { speaker: 'nurmelek', line: "Benden uzun olsun, kumral olsun, baby face olsun." }
+            { speaker: 'nurmelek', line: "Benden uzun olsun, kumral olsun, baby face olsun." },
         ]
     },
     {
@@ -221,6 +245,10 @@ export const conversations: ConversationScene[] = [
     },
     {
         situation: "Ertesi gün konuşarak durumu biraz olsun toparlarlar. Selim, Nurmelek'in saat 7'deki vize görüşmesine geleceğini söyler. Birlikte görüşmeye giderler, tatlı zaman geçirirler, Nurmelek Selim'le barışır.",
+        dialogue: []
+    },
+    {
+        situation: "Ders çalışmaya ve birlikte zaman geçirmeye devam ederler.",
         dialogue: []
     },
     {
