@@ -8,9 +8,11 @@ import { characters, type ConversationItem, type Character } from '@/lib/convers
 import { useTypingEffect } from '@/hooks/use-typing-effect';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from './ui/avatar';
+import { useToast } from '@/hooks/use-toast';
+import { Badge } from './ui/badge';
 
 type ConversationDisplayProps = {
   item: ConversationItem;
@@ -18,17 +20,46 @@ type ConversationDisplayProps = {
 };
 
 let dialogueSynth: Tone.Synth;
+let achievementPlayer: Tone.Player;
 
 export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) {
   const [showNextButton, setShowNextButton] = useState(false);
+  const { toast } = useToast();
+
+  const isDialogue = item.type === 'dialogue';
+  const fullText = isDialogue ? item.line : item.text;
   
-  const textToDisplay = item.type === 'dialogue' ? item.line : item.text;
-  const currentSpeakerId = item.type === 'dialogue' ? item.speaker : null;
+  const hasAchievement = fullText.includes('Başarım:');
+  const [narrativeText, achievementText] = hasAchievement 
+    ? fullText.split('Başarım:') 
+    : [fullText, ''];
+
+  const textToDisplay = narrativeText.trim();
+  const currentSpeakerId = isDialogue ? item.speaker : null;
   const speakerInfo = currentSpeakerId ? characters[currentSpeakerId] : null;
+
+  const playAchievementSound = useCallback(() => {
+    if (achievementPlayer && Tone.context.state === 'running') {
+      achievementPlayer.start();
+    }
+  }, []);
 
   const onFinishedTyping = useCallback(() => {
     setShowNextButton(true);
-  }, []);
+    if (hasAchievement) {
+      playAchievementSound();
+      toast({
+        title: (
+          <div className="flex items-center gap-2">
+            <Trophy className="text-yellow-400" />
+            <span className="font-bold">Achievement Unlocked!</span>
+          </div>
+        ),
+        description: <p className="font-semibold">{achievementText.trim()}</p>,
+        className: "border-yellow-400 bg-background",
+      });
+    }
+  }, [hasAchievement, achievementText, playAchievementSound, toast]);
 
   const playDialogueSound = useCallback(() => {
     if (dialogueSynth && Tone.context.state === 'running') {
@@ -49,6 +80,12 @@ export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) 
             oscillator: { type: 'square' },
             envelope: { attack: 0.001, decay: 0.1, sustain: 0.1, release: 0.1 }
         }).toDestination();
+    }
+    if (!achievementPlayer) {
+      achievementPlayer = new Tone.Player({
+        url: "https://cdn.pixabay.com/audio/2022/03/15/audio_2b2333414b.mp3", // 8-bit success sound
+        autostart: false,
+      }).toDestination();
     }
     
     setShowNextButton(false);
@@ -108,7 +145,17 @@ export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) 
                 </div>
               </div>
             ) : (
-                <p className="italic text-muted-foreground text-lg leading-snug font-body min-h-[100px] p-4">{displayedText}</p>
+                <div>
+                    <p className="italic text-muted-foreground text-lg leading-snug font-body min-h-[100px] p-4">{displayedText}</p>
+                    {hasAchievement && showNextButton && (
+                        <div className="flex justify-center -mt-4">
+                            <Badge variant="outline" className="border-yellow-400 text-yellow-500 bg-yellow-400/10 animate-fade-in">
+                                <Trophy className="w-4 h-4 mr-2"/>
+                                {achievementText.trim()}
+                            </Badge>
+                        </div>
+                    )}
+                </div>
             )}
           </CardContent>
           {showNextButton && (
