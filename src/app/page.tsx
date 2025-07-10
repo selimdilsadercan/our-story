@@ -32,6 +32,15 @@ export default function Home() {
     }
   }, [currentItemIndex]);
 
+  const handlePreviousItem = useCallback(() => {
+    if (gameState === 'end') {
+      setGameState('playing');
+      // The index is already at the last item, so no need to change it.
+    } else if (currentItemIndex > 0) {
+      setCurrentItemIndex(prev => prev - 1);
+    }
+  }, [currentItemIndex, gameState]);
+
   const renderGameState = () => {
     switch (gameState) {
       case 'intro':
@@ -47,14 +56,15 @@ export default function Home() {
           </Card>
         );
       case 'playing':
-        return <ConversationDisplay item={conversationTimeline[currentItemIndex]} onNext={handleNextItem} />;
+        return <ConversationDisplay item={conversationTimeline[currentItemIndex]} onNext={handleNextItem} onBack={handlePreviousItem} canGoBack={currentItemIndex > 0} />;
       case 'end':
         return (
           <Card className="text-center p-8 flex flex-col items-center gap-6 animate-fade-in shadow-xl border-2 border-primary/20">
             <h1 className="text-4xl font-headline text-primary">Happy Valentine's Day!</h1>
             <p className="text-muted-foreground">Thank you for sharing this story with me.</p>
             <div className="flex gap-4">
-              <Button onClick={() => { setCurrentItemIndex(0); setGameState('playing'); }} size="lg">Replay Story</Button>
+               <Button onClick={handlePreviousItem} size="lg" variant="outline">Go Back</Button>
+               <Button onClick={() => { setCurrentItemIndex(0); setGameState('playing'); }} size="lg">Replay Story</Button>
             </div>
              <p className="text-sm text-muted-foreground mt-4">I love you, Nurmelek ❤️</p>
           </Card>

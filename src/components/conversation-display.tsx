@@ -8,7 +8,7 @@ import { characters, type ConversationItem, type Character } from '@/lib/convers
 import { useTypingEffect } from '@/hooks/use-typing-effect';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ChevronRight, Trophy } from 'lucide-react';
+import { ChevronRight, Trophy, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { useToast } from '@/hooks/use-toast';
@@ -17,12 +17,14 @@ import { Badge } from './ui/badge';
 type ConversationDisplayProps = {
   item: ConversationItem;
   onNext: () => void;
+  onBack: () => void;
+  canGoBack: boolean;
 };
 
 let dialogueSynth: Tone.Synth;
 let achievementPlayer: Tone.Player;
 
-export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) {
+export function ConversationDisplay({ item, onNext, onBack, canGoBack }: ConversationDisplayProps) {
   const [showNextButton, setShowNextButton] = useState(false);
   const { toast } = useToast();
 
@@ -61,7 +63,7 @@ export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) 
     }
   }, [hasAchievement, achievementText, playAchievementSound, toast]);
 
-  const playDialogueSound = useCallback(() => {
+  const playSound = useCallback(() => {
     if (dialogueSynth && Tone.context.state === 'running') {
       dialogueSynth.triggerAttackRelease('C#5', '32n');
     }
@@ -70,7 +72,7 @@ export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) 
   const { displayedText, start: startTyping, complete: completeTyping } = useTypingEffect({
     textToType: textToDisplay,
     speed: 35,
-    onCharacterTyped: playDialogueSound,
+    onCharacterTyped: playSound,
     onFinished: onFinishedTyping,
   });
 
@@ -83,7 +85,7 @@ export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) 
     }
     if (!achievementPlayer) {
       achievementPlayer = new Tone.Player({
-        url: "https://cdn.pixabay.com/audio/2022/03/15/audio_2b2333414b.mp3", // 8-bit success sound
+        url: "https://cdn.pixabay.com/audio/2022/03/15/audio_2b2333414b.mp3",
         autostart: false,
       }).toDestination();
     }
@@ -159,7 +161,10 @@ export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) 
             )}
           </CardContent>
           {showNextButton && (
-            <div className="flex justify-end p-2 border-t border-border/50">
+            <div className="flex justify-between p-2 border-t border-border/50">
+              <Button onClick={(e) => { e.stopPropagation(); onBack(); }} variant="ghost" size="sm" className={cn(!canGoBack && 'invisible')}>
+                <ChevronLeft className="w-4 h-4 mr-1" /> Back
+              </Button>
               <Button onClick={(e) => { e.stopPropagation(); onNext(); }} variant="ghost" size="sm" className="animate-bounce-sm">
                 Next <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
