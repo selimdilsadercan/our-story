@@ -1,9 +1,10 @@
+
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import * as Tone from 'tone';
 import { ConversationDisplay } from '@/components/conversation-display';
-import { conversations } from '@/lib/conversation-data';
+import { conversationTimeline } from '@/lib/conversation-data';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Heart, Music, Volume2, VolumeX } from 'lucide-react';
@@ -12,7 +13,7 @@ type GameState = 'intro' | 'playing' | 'end';
 
 export default function Home() {
   const [gameState, setGameState] = useState<GameState>('intro');
-  const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
+  const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [audioReady, setAudioReady] = useState(false);
   const [musicMuted, setMusicMuted] = useState(false);
 
@@ -46,13 +47,13 @@ export default function Home() {
     setGameState('playing');
   }, [audioReady]);
 
-  const handleNextScene = useCallback(() => {
-    if (currentSceneIndex < conversations.length - 1) {
-      setCurrentSceneIndex(prev => prev + 1);
+  const handleNextItem = useCallback(() => {
+    if (currentItemIndex < conversationTimeline.length - 1) {
+      setCurrentItemIndex(prev => prev + 1);
     } else {
       setGameState('end');
     }
-  }, [currentSceneIndex]);
+  }, [currentItemIndex]);
   
   const toggleMute = () => {
     if (Tone.getTransport().state === 'started') {
@@ -76,14 +77,14 @@ export default function Home() {
           </Card>
         );
       case 'playing':
-        return <ConversationDisplay scene={conversations[currentSceneIndex]} onNextScene={handleNextScene} />;
+        return <ConversationDisplay item={conversationTimeline[currentItemIndex]} onNext={handleNextItem} />;
       case 'end':
         return (
           <Card className="text-center p-8 flex flex-col items-center gap-6 animate-fade-in shadow-xl border-2 border-primary/20">
             <h1 className="text-4xl font-headline text-primary">Happy Valentine's Day!</h1>
             <p className="text-muted-foreground">Thank you for sharing this story with me.</p>
             <div className="flex gap-4">
-              <Button onClick={() => { setCurrentSceneIndex(0); setGameState('playing'); }} size="lg">Replay Story</Button>
+              <Button onClick={() => { setCurrentItemIndex(0); setGameState('playing'); }} size="lg">Replay Story</Button>
             </div>
              <p className="text-sm text-muted-foreground mt-4">I love you, Nurmelek ❤️</p>
           </Card>

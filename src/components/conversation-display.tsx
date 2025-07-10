@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import * as Tone from 'tone';
-import { characters, type ConversationScene, type Dialogue } from '@/lib/conversation-data';
+import { characters, type ConversationItem, type Character } from '@/lib/conversation-data';
 import { useTypingEffect } from '@/hooks/use-typing-effect';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,54 +12,28 @@ import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type ConversationDisplayProps = {
-  scene: ConversationScene;
-  onNextScene: () => void;
-};
-
-type DisplayItem = {
-    type: 'situation' | 'dialogue';
-    text: string;
-    speaker: Dialogue['speaker'] | null;
+  item: ConversationItem;
+  onNext: () => void;
 };
 
 let dialogueSynth: Tone.Synth;
 
-export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayProps) {
-  const [lineIndex, setLineIndex] = useState(0); 
+export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) {
   const [showNextButton, setShowNextButton] = useState(false);
-
-  const displayItems = React.useMemo<DisplayItem[]>(() => {
-    const items: DisplayItem[] = [];
-    if (scene.situation) {
-        items.push({ type: 'situation', text: scene.situation, speaker: null });
-    }
-    if (scene.dialogue) {
-        items.push(...scene.dialogue.map(d => ({ type: 'dialogue', text: d.line, speaker: d.speaker })));
-    }
-    return items;
-  }, [scene]);
   
-  const currentItem = displayItems[lineIndex];
-  const isLastLine = lineIndex >= displayItems.length - 1;
-  const textToDisplay = currentItem?.text || '';
-
-  const handleNext = useCallback(() => {
-    if (isLastLine) {
-      onNextScene();
-    } else {
-      setLineIndex((prev) => prev + 1);
-    }
-  }, [isLastLine, onNextScene, lineIndex]);
+  const textToDisplay = item.type === 'dialogue' ? item.line : item.text;
+  const currentSpeakerId = item.type === 'dialogue' ? item.speaker : null;
+  const speakerInfo = currentSpeakerId ? characters[currentSpeakerId] : null;
 
   const onFinishedTyping = useCallback(() => {
     setShowNextButton(true);
   }, []);
 
   const playDialogueSound = useCallback(() => {
-    if (dialogueSynth && Tone.context.state === 'running' && currentItem?.type === 'dialogue') {
+    if (dialogueSynth && Tone.context.state === 'running' && item.type === 'dialogue') {
       dialogueSynth.triggerAttackRelease('C#5', '32n');
     }
-  }, [currentItem]);
+  }, [item.type]);
 
   const { displayedText, start: startTyping, complete: completeTyping } = useTypingEffect({
     textToType: textToDisplay,
@@ -68,16 +42,6 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     onFinished: onFinishedTyping,
   });
 
-  // This effect runs when the scene changes. It resets the line index and handles empty scenes.
-  useEffect(() => {
-    setLineIndex(0);
-    if (displayItems.length === 0) {
-      onNextScene();
-    }
-  }, [scene, displayItems.length, onNextScene]);
-  
-  // This effect runs when the line index changes (or the scene changes, causing the line to change).
-  // It starts the typing animation for the new line.
   useEffect(() => {
     if (!dialogueSynth) {
         dialogueSynth = new Tone.Synth({
@@ -87,36 +51,31 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     }
     
     setShowNextButton(false);
-
-    if(currentItem) {
-        startTyping();
-    }
+    startTyping();
     
-  }, [currentItem, startTyping]);
+  }, [item, startTyping]);
 
+  const getPresentCharacters = (): Character['id'][] => {
+    if (item.type === 'dialogue') {
+      return [item.speaker]; // For now, let's assume only the current speaker is present
+    }
+    return ['selim', 'nurmelek']; // For situations, maybe default to both being present? Or can be empty.
+  };
 
-  const speakerInfo = currentItem?.speaker ? characters[currentItem.speaker] : null;
-
-  if (!currentItem) {
-    return null; // Don't render anything if there's no item to display
-  }
-
-  const currentSpeaker = currentItem?.speaker || null;
+  const presentCharacters = getPresentCharacters();
 
   return (
     <div className="w-full h-full flex flex-col p-4 animate-fade-in">
       <div className="relative flex-1 flex items-center justify-around min-h-[200px]">
         {Object.values(characters).map((char) => {
-            const isSpeaking = char.id === currentSpeaker;
-            const isPresent = scene.dialogue?.some(d => d.speaker === char.id) ?? false;
-            
-            // Only show characters if it's a dialogue scene and they are part of it.
-            const showCharacter = currentItem?.type === 'dialogue' && isPresent;
+            const isSpeaking = char.id === currentSpeakerId;
+            // A simple logic to show both characters during situations, and speaking/non-speaking during dialogue
+            const isPresentInScene = item.type === 'situation' || (item.type === 'dialogue' && presentCharacters.includes(char.id));
 
             return (
               <div key={char.id} className={cn("transition-all duration-300", 
-                  isSpeaking ? "transform scale-110" : "opacity-70 scale-90", 
-                  showCharacter ? 'opacity-100' : 'opacity-0'
+                  isSpeaking ? "transform scale-110" : "opacity-70 scale-90",
+                  isPresentInScene ? 'opacity-100' : 'opacity-0'
               )}>
                 <Image
                   src={char.image}
@@ -145,7 +104,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
           </CardContent>
           {showNextButton && (
             <div className="flex justify-end p-2">
-              <Button onClick={(e) => { e.stopPropagation(); handleNext(); }} variant="ghost" size="sm" className="animate-bounce-sm">
+              <Button onClick={(e) => { e.stopPropagation(); onNext(); }} variant="ghost" size="sm" className="animate-bounce-sm">
                 Next <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
