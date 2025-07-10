@@ -22,10 +22,10 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
   const [showNextButton, setShowNextButton] = useState(false);
   const [currentSpeaker, setCurrentSpeaker] = useState<Dialogue['speaker'] | null>(null);
 
-  const displayItems = [
+  const displayItems = React.useMemo(() => [
       { type: 'situation', text: scene.situation, speaker: null },
       ...scene.dialogue.map(d => ({ type: 'dialogue', text: d.line, speaker: d.speaker }))
-  ];
+  ], [scene]);
   
   const isLastLine = lineIndex >= displayItems.length - 1;
 
@@ -36,7 +36,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     } else {
       setLineIndex((prev) => prev + 1);
     }
-  }, [isLastLine, onNextScene, lineIndex, displayItems.length]);
+  }, [isLastLine, onNextScene, lineIndex]);
 
   const onFinishedTyping = useCallback(() => {
     setShowNextButton(true);
