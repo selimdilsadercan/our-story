@@ -59,6 +59,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
         ),
         description: <p className="font-semibold">{achievementText.trim()}</p>,
         className: "border-yellow-400 bg-background",
+        duration: 10000,
       });
     }
   }, [hasAchievement, achievementText, playAchievementSound, toast]);
@@ -102,18 +103,17 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
   const getPresentCharacters = useCallback((): Character['id'][] => {
     if (item.type === 'dialogue') {
       // If someone is speaking, they are present.
-      // If the other main character is mentioned, show them too.
-      // Otherwise, just show the speaker and the other main character.
       const speaker = item.speaker;
-      const otherMain = speaker === 'selim' ? 'nurmelek' : 'selim';
       const present: Character['id'][] = [speaker];
 
-      // If Işıl is speaking, show her with Selim and Nurmelek
-      if (speaker === 'isil') {
+      // If a main character is speaking, always show the other one.
+      if (speaker === 'selim') {
+        present.push('nurmelek');
+      } else if (speaker === 'nurmelek') {
+        present.push('selim');
+      } else if (speaker === 'isil') {
+         // If Isil is speaking, show her with Selim and Nurmelek
         present.push('selim', 'nurmelek');
-      } else {
-         // If a main character is speaking, always show the other one.
-        present.push(otherMain);
       }
       return present;
     }
