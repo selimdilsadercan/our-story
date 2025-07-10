@@ -19,6 +19,14 @@ export function useTypingEffect({
   const [isTyping, setIsTyping] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const indexRef = useRef(0);
+  const onFinishedRef = useRef(onFinished);
+  const onCharacterTypedRef = useRef(onCharacterTyped);
+
+  // Keep refs updated with the latest callbacks
+  useEffect(() => {
+    onFinishedRef.current = onFinished;
+    onCharacterTypedRef.current = onCharacterTyped;
+  });
 
   const start = useCallback(() => {
     if (timeoutRef.current) {
@@ -28,39 +36,45 @@ export function useTypingEffect({
     indexRef.current = 0;
     setIsTyping(true);
   }, []);
-
+  
   useEffect(() => {
-    if (!isTyping) {
-      return;
-    }
-    
-    if (indexRef.current >= textToType.length) {
-      setIsTyping(false);
-      onFinished?.();
+    if (!isTyping || !textToType) {
       return;
     }
 
-    timeoutRef.current = setTimeout(() => {
+    const typeCharacter = () => {
+      if (indexRef.current >= textToType.length) {
+        setIsTyping(false);
+        onFinishedRef.current?.();
+        return;
+      }
+
       setDisplayedText((prev) => prev + textToType[indexRef.current]);
-      onCharacterTyped?.();
+      onCharacterTypedRef.current?.();
       indexRef.current++;
-    }, speed);
+      
+      timeoutRef.current = setTimeout(typeCharacter, speed);
+    };
+
+    timeoutRef.current = setTimeout(typeCharacter, speed);
 
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [displayedText, isTyping, onCharacterTyped, onFinished, speed, textToType]);
+  }, [isTyping, textToType, speed]);
 
   const complete = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    setIsTyping(false);
-    setDisplayedText(textToType);
-    onFinished?.();
-  }, [textToType, onFinished]);
+    if (isTyping) {
+      setIsTyping(false);
+      setDisplayedText(textToType);
+      onFinishedRef.current?.();
+    }
+  }, [textToType, isTyping]);
 
   return { displayedText, start, isTyping, complete };
 }
