@@ -114,10 +114,11 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
 
   const getPresentCharacters = useCallback((): Character['id'][] => {
     if (item.type === 'dialogue') {
-      const present: Character['id'][] = [item.speaker];
-       if (item.speaker !== 'selim') present.push('selim');
-       if (item.speaker !== 'nurmelek') present.push('nurmelek');
-      return present;
+      if (item.speaker === 'isil') {
+        return ['isil'];
+      }
+      // For Selim or Nurmelek speaking, show both.
+      return ['selim', 'nurmelek'];
     }
     // For situations, nobody is shown.
     return [];
@@ -138,7 +139,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
                   !isPresentInScene && 'opacity-0 scale-50 -translate-y-10',
                   char.id === 'selim' && '-translate-x-1/3',
                   char.id === 'nurmelek' && 'translate-x-1/3',
-                  char.id === 'isil' && 'translate-x-full'
+                  char.id === 'isil' && 'translate-x-0' // Centered when alone
               )}>
                 <Image
                   src={char.image}
