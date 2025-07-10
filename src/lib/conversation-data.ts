@@ -25,7 +25,7 @@ export const characters: Record<Character['id'], Character> = {
     id: 'selim',
     name: 'Selim',
     image: 'https://placehold.co/200x200.png',
-    dataAiHint: 'pixel art boy',
+    dataAiHint: 'pixel art man',
     color: '#3b82f6'
   },
   nurmelek: {
