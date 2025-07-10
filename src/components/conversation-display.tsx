@@ -36,7 +36,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     } else {
       setLineIndex((prev) => prev + 1);
     }
-  }, [isLastLine, onNextScene]);
+  }, [isLastLine, onNextScene, lineIndex]);
 
   const onFinishedTyping = useCallback(() => {
     setShowNextButton(true);
