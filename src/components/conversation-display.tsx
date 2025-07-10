@@ -31,10 +31,10 @@ export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) 
   }, []);
 
   const playDialogueSound = useCallback(() => {
-    if (dialogueSynth && Tone.context.state === 'running' && item.type === 'dialogue') {
+    if (dialogueSynth && Tone.context.state === 'running') {
       dialogueSynth.triggerAttackRelease('C#5', '32n');
     }
-  }, [item.type]);
+  }, []);
 
   const { displayedText, start: startTyping, complete: completeTyping } = useTypingEffect({
     textToType: textToDisplay,

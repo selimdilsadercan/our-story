@@ -7,7 +7,7 @@ import { ConversationDisplay } from '@/components/conversation-display';
 import { conversationTimeline } from '@/lib/conversation-data';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Heart, Music, Volume2, VolumeX } from 'lucide-react';
+import { Heart, Play } from 'lucide-react';
 
 type GameState = 'intro' | 'playing' | 'end';
 
@@ -15,35 +15,12 @@ export default function Home() {
   const [gameState, setGameState] = useState<GameState>('intro');
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [audioReady, setAudioReady] = useState(false);
-  const [musicMuted, setMusicMuted] = useState(false);
-
-  const musicLoop = useRef<Tone.Loop | null>(null);
 
   const handleStart = useCallback(async () => {
-    if (audioReady) {
-      setGameState('playing');
-      return;
+    if (!audioReady) {
+      await Tone.start();
+      setAudioReady(true);
     }
-    
-    await Tone.start();
-    const synth = new Tone.FMSynth({
-        harmonicity: 3,
-        modulationIndex: 10,
-        envelope: { attack: 0.01, decay: 0.2, release: 0.2 },
-        modulation: { type: 'square' },
-        modulationEnvelope: { attack: 0.01, decay: 0.1, release: 0.1 }
-    }).toDestination();
-    
-    const notes = ["C4", "E4", "G4", "B4", "C5", "G4", "E4"];
-    let noteIndex = 0;
-
-    musicLoop.current = new Tone.Loop(time => {
-      synth.triggerAttackRelease(notes[noteIndex % notes.length], '8n', time);
-      noteIndex++;
-    }, '4n').start(0);
-
-    Tone.Transport.start();
-    setAudioReady(true);
     setGameState('playing');
   }, [audioReady]);
 
@@ -54,13 +31,6 @@ export default function Home() {
       setGameState('end');
     }
   }, [currentItemIndex]);
-  
-  const toggleMute = () => {
-    if (Tone.getTransport().state === 'started') {
-        Tone.getDestination().mute = !musicMuted;
-        setMusicMuted(!musicMuted);
-    }
-  };
 
   const renderGameState = () => {
     switch (gameState) {
@@ -71,7 +41,7 @@ export default function Home() {
             <h1 className="text-4xl font-headline text-primary">Pixel Love Story</h1>
             <p className="text-muted-foreground">A Valentine's Day tale for my one and only.</p>
             <Button onClick={handleStart} size="lg" className="font-bold">
-              <Music className="mr-2" />
+              <Play className="mr-2" />
               Start the Story
             </Button>
           </Card>
@@ -96,13 +66,6 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gradient-to-br from-background to-secondary font-body">
-      <div className="fixed top-4 right-4 z-10 flex gap-2">
-        {audioReady && (
-            <Button variant="outline" size="icon" onClick={toggleMute}>
-                {musicMuted ? <VolumeX /> : <Volume2 />}
-            </Button>
-        )}
-      </div>
       <div className="w-full max-w-lg flex items-center justify-center">
         {renderGameState()}
       </div>

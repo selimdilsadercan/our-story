@@ -4,6 +4,7 @@ export interface Character {
   name: string;
   image: string;
   dataAiHint: string;
+  color: string;
 }
 
 export interface Dialogue {
@@ -24,19 +25,22 @@ export const characters: Record<Character['id'], Character> = {
     id: 'selim',
     name: 'Selim',
     image: 'https://placehold.co/200x200.png',
-    dataAiHint: 'pixel art boy'
+    dataAiHint: 'pixel art boy',
+    color: '#3b82f6'
   },
   nurmelek: {
     id: 'nurmelek',
     name: 'Nurmelek',
     image: 'https://placehold.co/200x200.png',
-    dataAiHint: 'pixel art girl'
+    dataAiHint: 'pixel art girl',
+    color: '#e879f9'
   },
   isil: {
     id: 'isil',
     name: 'Işıl',
     image: 'https://placehold.co/200x200.png',
-    dataAiHint: 'pixel art friend'
+    dataAiHint: 'pixel art friend',
+    color: '#f59e0b'
   },
 };
 
