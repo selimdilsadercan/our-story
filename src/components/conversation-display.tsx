@@ -22,10 +22,16 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
   const [showNextButton, setShowNextButton] = useState(false);
   const [currentSpeaker, setCurrentSpeaker] = useState<Dialogue['speaker'] | null>(null);
 
-  const displayItems = React.useMemo(() => [
-      { type: 'situation', text: scene.situation, speaker: null },
-      ...scene.dialogue.map(d => ({ type: 'dialogue', text: d.line, speaker: d.speaker }))
-  ], [scene]);
+  const displayItems = React.useMemo(() => {
+    const items = [];
+    if (scene.situation) {
+        items.push({ type: 'situation', text: scene.situation, speaker: null });
+    }
+    if (scene.dialogue) {
+        items.push(...scene.dialogue.map(d => ({ type: 'dialogue', text: d.line, speaker: d.speaker })));
+    }
+    return items;
+  }, [scene]);
   
   const isLastLine = lineIndex >= displayItems.length - 1;
 
@@ -36,11 +42,16 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     } else {
       setLineIndex((prev) => prev + 1);
     }
-  }, [isLastLine, onNextScene, lineIndex]);
+  }, [isLastLine, onNextScene, lineIndex, displayItems.length]);
 
   const onFinishedTyping = useCallback(() => {
-    setShowNextButton(true);
-  }, []);
+    if (displayItems.length > 0) {
+      setShowNextButton(true);
+    } else {
+      // If there are no items to display, move to the next scene automatically.
+      onNextScene();
+    }
+  }, [displayItems.length, onNextScene]);
 
   const playDialogueSound = useCallback(() => {
     if (dialogueSynth && Tone.context.state === 'running') {
@@ -78,8 +89,19 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     setLineIndex(0);
   }, [scene]);
 
+  // Handle scenes with no text content
+  useEffect(() => {
+    if (displayItems.length === 0) {
+      onNextScene();
+    }
+  }, [displayItems, onNextScene]);
+
 
   const speakerInfo = currentItem?.speaker ? characters[currentItem.speaker] : null;
+
+  if (displayItems.length === 0) {
+    return null; // Don't render anything if the scene is empty
+  }
 
   return (
     <div className="w-full h-full flex flex-col p-4 animate-fade-in">
@@ -87,13 +109,12 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
         {Object.values(characters).map((char) => {
             const isSpeaking = char.id === currentSpeaker;
             const isPresent = scene.dialogue.some(d => d.speaker === char.id);
-            if(!isPresent && lineIndex > 0) return null;
+            if(!isPresent && currentItem?.type === 'dialogue') return null;
             
-            const showCharacter = lineIndex > 0 ? isPresent : false;
-            if(!showCharacter && currentItem.type !== 'dialogue') return null;
+            const showCharacter = currentItem?.type === 'dialogue';
 
             return (
-              <div key={char.id} className={cn("transition-all duration-300", isSpeaking ? "transform scale-110" : "opacity-70 scale-90")}>
+              <div key={char.id} className={cn("transition-all duration-300", isSpeaking ? "transform scale-110" : "opacity-70 scale-90", showCharacter ? 'opacity-100' : 'opacity-0')}>
                 <Image
                   src={char.image}
                   alt={char.name}
