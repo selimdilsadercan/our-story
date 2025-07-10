@@ -24,15 +24,15 @@ export const characters: Record<Character['id'], Character> = {
   selim: {
     id: 'selim',
     name: 'Selim',
-    image: 'https://placehold.co/200x200.png',
-    dataAiHint: 'pixel art man',
+    image: '/selim.png',
+    dataAiHint: 'man with glasses',
     color: '#3b82f6'
   },
   nurmelek: {
     id: 'nurmelek',
     name: 'Nurmelek',
-    image: 'https://placehold.co/200x200.png',
-    dataAiHint: 'pixel art girl',
+    image: '/nurmelek.png',
+    dataAiHint: 'girl with brown hair',
     color: '#e879f9'
   },
   isil: {
