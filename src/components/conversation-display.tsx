@@ -23,7 +23,8 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
   const [showNextButton, setShowNextButton] = useState(false);
   const [currentSpeaker, setCurrentSpeaker] = useState<Dialogue['speaker'] | null>(null);
 
-  const isLastLine = lineIndex >= scene.dialogue.length - 1;
+  const hasDialogue = scene.dialogue && scene.dialogue.length > 0;
+  const isLastLine = !hasDialogue || lineIndex >= scene.dialogue.length - 1;
 
   const handleNext = useCallback(() => {
     setShowNextButton(false);
@@ -44,36 +45,42 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     }
   }, []);
 
+  const dialogueLine = hasDialogue ? scene.dialogue[lineIndex]?.line : '';
+
   const { displayedText, start: startTyping, complete: completeTyping } = useTypingEffect({
-    textToType: scene.dialogue[lineIndex]?.line || '',
+    textToType: dialogueLine || '',
     speed: 35,
     onCharacterTyped: playDialogueSound,
     onFinished: onFinishedTyping,
   });
 
   useEffect(() => {
+    if (!hasDialogue) {
+        // If there's no dialogue, just show the situation and an arrow to continue.
+        setShowNextButton(true);
+        return;
+    }
+
     if (!dialogueSynth) {
         dialogueSynth = new Tone.Synth({
             oscillator: { type: 'square' },
             envelope: { attack: 0.001, decay: 0.1, sustain: 0.1, release: 0.1 }
         }).toDestination();
     }
-
     startTyping();
     setCurrentSpeaker(scene.dialogue[lineIndex]?.speaker);
-  }, [lineIndex, scene, startTyping]);
+  }, [lineIndex, scene, startTyping, hasDialogue]);
 
-  const dialogue = scene.dialogue[lineIndex];
-  if (!dialogue) return null;
 
-  const speakerInfo = characters[dialogue.speaker];
+  const dialogue = hasDialogue ? scene.dialogue[lineIndex] : null;
+  const speakerInfo = dialogue ? characters[dialogue.speaker] : null;
 
   return (
     <div className="w-full h-full flex flex-col p-4 animate-fade-in">
       <div className="relative flex-1 flex items-center justify-around">
         {Object.values(characters).map((char) => {
-            const isSpeaking = char.id === currentSpeaker;
-            const isPresent = scene.dialogue.some(d => d.speaker === char.id);
+            const isSpeaking = hasDialogue && char.id === currentSpeaker;
+            const isPresent = hasDialogue && scene.dialogue.some(d => d.speaker === char.id);
             if(!isPresent) return null;
 
             return (
@@ -91,7 +98,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
         })}
       </div>
       
-      <div onClick={completeTyping} className="cursor-pointer">
+      <div onClick={hasDialogue ? completeTyping : handleNext} className="cursor-pointer">
         <Card className="min-h-[180px] flex flex-col justify-between shadow-lg border-2 border-primary/20 bg-card/80 backdrop-blur-sm">
           <CardContent className="p-4 space-y-2">
             <p className="italic text-muted-foreground text-sm animate-fade-in">{scene.situation}</p>
@@ -102,8 +109,8 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
           </CardContent>
           {showNextButton && (
             <div className="flex justify-end p-2">
-              <Button onClick={handleNext} variant="ghost" size="sm" className="animate-bounce-sm">
-                {isLastLine ? 'Finish' : 'Next'} <ChevronRight className="w-4 h-4 ml-1" />
+              <Button onClick={(e) => { e.stopPropagation(); handleNext(); }} variant="ghost" size="sm" className="animate-bounce-sm">
+                Next <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
           )}
