@@ -60,13 +60,11 @@ export default function Home() {
       case 'end':
         return (
           <Card className="text-center p-8 flex flex-col items-center gap-6 animate-fade-in shadow-xl border-2 border-primary/20">
-            <h1 className="text-4xl font-headline text-primary">Happy Valentine's Day!</h1>
-            <p className="text-muted-foreground">Thank you for sharing this story with me.</p>
+            <h1 className="text-4xl font-headline text-primary">Seni Seviyorum Aşkim ❤️</h1>
             <div className="flex gap-4">
-               <Button onClick={handlePreviousItem} size="lg" variant="outline">Go Back</Button>
-               <Button onClick={() => { setCurrentItemIndex(0); setGameState('playing'); }} size="lg">Replay Story</Button>
+               <Button onClick={handlePreviousItem} size="lg" variant="outline">Geri Dön</Button>
+               <Button onClick={() => { setCurrentItemIndex(0); setGameState('playing'); }} size="lg">Hikayeyi Tekrar Oynat</Button>
             </div>
-             <p className="text-sm text-muted-foreground mt-4">I love you, Nurmelek ❤️</p>
           </Card>
         );
       default:

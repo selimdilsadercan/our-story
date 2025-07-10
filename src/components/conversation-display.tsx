@@ -93,7 +93,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
         narrationSynth = new Tone.Synth({
             oscillator: { type: 'sine' },
             envelope: { attack: 0.001, decay: 0.05, sustain: 0.05, release: 0.1 },
-            volume: 0
+            volume: 6
         }).toDestination();
     }
     if (!achievementPlayer) {
@@ -176,10 +176,10 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
           {showNextButton && (
             <div className="flex justify-between p-2 border-t border-border/50">
               <Button onClick={(e) => { e.stopPropagation(); onBack(); }} variant="ghost" size="sm" className={cn(!canGoBack && 'invisible')}>
-                <ChevronLeft className="w-4 h-4 mr-1" /> Back
+                <ChevronLeft className="w-4 h-4 mr-1" /> Önceki
               </Button>
               <Button onClick={(e) => { e.stopPropagation(); onNext(); }} variant="ghost" size="sm" className="animate-bounce-sm">
-                Next <ChevronRight className="w-4 h-4 ml-1" />
+                Sonraki <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
           )}
