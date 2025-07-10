@@ -11,12 +11,16 @@ import { Heart, Music, Volume2, VolumeX } from 'lucide-react';
 type GameState = 'intro' | 'playing' | 'end';
 
 export default function Home() {
-  const [gameState, setGameState] = useState<GameState>('intro');
+  const [gameState, setGameState] = useState<GameState | null>(null);
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [audioReady, setAudioReady] = useState(false);
   const [musicMuted, setMusicMuted] = useState(false);
 
   const musicLoop = useRef<Tone.Loop | null>(null);
+
+  useEffect(() => {
+    setGameState('intro');
+  }, []);
 
   const handleStart = useCallback(async () => {
     if (audioReady) {
@@ -88,6 +92,8 @@ export default function Home() {
              <p className="text-sm text-muted-foreground mt-4">I love you, Nurmelek ❤️</p>
           </Card>
         );
+      default:
+        return null;
     }
   };
 
