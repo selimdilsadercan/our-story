@@ -60,7 +60,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
         ),
         description: <p className="font-semibold">{achievementText.trim()}</p>,
         className: "border-yellow-400 bg-background",
-        duration: 10000,
+        duration: 2000,
       });
     }
   }, [hasAchievement, achievementText, playAchievementSound, toast]);
@@ -115,19 +115,23 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
   const getPresentCharacters = useCallback((): Character['id'][] => {
     if (item.type === 'dialogue') {
       const present: Character['id'][] = [item.speaker];
-       if (item.speaker === 'selim' && item.line.toLowerCase().includes('nurmelek')) {
-        present.push('nurmelek');
+      if(item.speaker === 'selim' && item.line.toLowerCase().includes('nurmelek')) {
+          present.push('nurmelek');
       } else if (item.speaker === 'nurmelek' && item.line.toLowerCase().includes('selim')) {
-        present.push('selim');
-      } else if (item.speaker !== 'selim' && item.speaker !== 'nurmelek') {
-        present.push('selim', 'nurmelek');
-      } else if (item.speaker === 'selim') {
-        present.push('nurmelek');
-      } else if (item.speaker === 'nurmelek') {
-        present.push('selim');
+          present.push('selim');
       }
       return Array.from(new Set(present));
     }
+
+    if (item.type === 'situation') {
+        const present: Character['id'][] = [];
+        if (item.text.toLowerCase().includes('selim')) present.push('selim');
+        if (item.text.toLowerCase().includes('nurmelek')) present.push('nurmelek');
+        if (item.text.toLowerCase().includes('isil')) present.push('isil');
+
+        if (present.length > 0) return present;
+    }
+
     return ['selim', 'nurmelek'];
 
   }, [item]);

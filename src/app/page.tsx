@@ -47,11 +47,11 @@ export default function Home() {
         return (
           <Card className="text-center p-8 flex flex-col items-center gap-6 animate-fade-in shadow-xl border-2 border-primary/20">
             <Heart className="w-20 h-20 text-primary" />
-            <h1 className="text-4xl font-headline text-primary">Pixel Love Story</h1>
-            <p className="text-muted-foreground">A Valentine's Day tale for my one and only.</p>
+            <h1 className="text-4xl font-headline text-primary">Hikayemiz</h1>
+            <p className="text-muted-foreground">Bu hikaye nasıl buraya geldi...</p>
             <Button onClick={handleStart} size="lg" className="font-bold">
               <Play className="mr-2" />
-              Start the Story
+              Başlat
             </Button>
           </Card>
         );
