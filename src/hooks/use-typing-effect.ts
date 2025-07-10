@@ -48,8 +48,9 @@ export function useTypingEffect({
         onFinishedRef.current?.();
         return;
       }
-
-      setDisplayedText((prev) => prev + textToType[indexRef.current]);
+      
+      const nextCharacter = textToType[indexRef.current];
+      setDisplayedText((prev) => prev + nextCharacter);
       onCharacterTypedRef.current?.();
       indexRef.current++;
       
