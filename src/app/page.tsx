@@ -103,7 +103,7 @@ export default function Home() {
             </Button>
         )}
       </div>
-      <div className="w-full max-w-lg h-[640px] flex items-center justify-center">
+      <div className="w-full max-w-lg flex items-center justify-center">
         {renderGameState()}
       </div>
     </main>

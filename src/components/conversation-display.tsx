@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback } from './ui/avatar';
 
 type ConversationDisplayProps = {
   item: ConversationItem;
@@ -57,25 +58,28 @@ export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) 
 
   const getPresentCharacters = (): Character['id'][] => {
     if (item.type === 'dialogue') {
-      return [item.speaker]; // For now, let's assume only the current speaker is present
+        const otherCharacters = Object.keys(characters).filter(id => id !== item.speaker) as Character['id'][];
+        return [item.speaker, ...otherCharacters.filter(id => item.line.includes(characters[id].name))];
     }
-    return ['selim', 'nurmelek']; // For situations, maybe default to both being present? Or can be empty.
+    return ['selim', 'nurmelek', 'isil'];
   };
 
   const presentCharacters = getPresentCharacters();
 
   return (
-    <div className="w-full h-full flex flex-col p-4 animate-fade-in">
-      <div className="relative flex-1 flex items-center justify-around min-h-[200px]">
+    <div className="w-full flex flex-col p-2 md:p-4 animate-fade-in space-y-4">
+      <div className="relative flex-1 flex items-end justify-center h-48 md:h-64">
         {Object.values(characters).map((char) => {
             const isSpeaking = char.id === currentSpeakerId;
-            // A simple logic to show both characters during situations, and speaking/non-speaking during dialogue
-            const isPresentInScene = item.type === 'situation' || (item.type === 'dialogue' && presentCharacters.includes(char.id));
+            const isPresentInScene = presentCharacters.includes(char.id);
 
             return (
-              <div key={char.id} className={cn("transition-all duration-300", 
-                  isSpeaking ? "transform scale-110" : "opacity-70 scale-90",
-                  isPresentInScene ? 'opacity-100' : 'opacity-0'
+              <div key={char.id} className={cn("transition-all duration-500 ease-in-out absolute bottom-0", 
+                  isSpeaking ? "transform scale-110 z-10" : "transform scale-90 opacity-70",
+                  !isPresentInScene && 'opacity-0 scale-50',
+                  char.id === 'selim' && '-translate-x-1/3',
+                  char.id === 'nurmelek' && 'translate-x-1/3',
+                  char.id === 'isil' && 'translate-x-full'
               )}>
                 <Image
                   src={char.image}
@@ -91,19 +95,24 @@ export function ConversationDisplay({ item, onNext }: ConversationDisplayProps) 
       </div>
       
       <div onClick={() => { if (!showNextButton) completeTyping(); }} className="cursor-pointer">
-        <Card className="min-h-[180px] flex flex-col justify-between shadow-lg border-2 border-primary/20 bg-card/80 backdrop-blur-sm">
-          <CardContent className="p-4 space-y-2">
+        <Card className="min-h-[160px] flex flex-col justify-between shadow-lg border-2 border-primary/20 bg-card/80 backdrop-blur-sm">
+          <CardContent className="p-4 space-y-2 flex-1">
             {speakerInfo ? (
-              <>
-                <h3 className="font-bold text-primary font-headline text-lg">{speakerInfo.name}</h3>
-                <p className="text-foreground text-lg leading-snug font-body h-16">{displayedText}</p>
-              </>
+              <div className="flex items-start gap-3">
+                 <Avatar className="w-10 h-10 border-2" style={{borderColor: speakerInfo.color}}>
+                    <AvatarFallback style={{backgroundColor: speakerInfo.color, color: 'white'}}>{speakerInfo.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="w-full">
+                    <h3 className="font-bold font-headline text-lg" style={{color: speakerInfo.color}}>{speakerInfo.name}</h3>
+                    <p className="text-foreground text-lg leading-snug font-body min-h-[72px]">{displayedText}</p>
+                </div>
+              </div>
             ) : (
-                <p className="italic text-muted-foreground text-lg leading-snug font-body h-24 p-4">{displayedText}</p>
+                <p className="italic text-muted-foreground text-lg leading-snug font-body min-h-[100px] p-4">{displayedText}</p>
             )}
           </CardContent>
           {showNextButton && (
-            <div className="flex justify-end p-2">
+            <div className="flex justify-end p-2 border-t border-border/50">
               <Button onClick={(e) => { e.stopPropagation(); onNext(); }} variant="ghost" size="sm" className="animate-bounce-sm">
                 Next <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
