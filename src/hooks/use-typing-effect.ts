@@ -30,11 +30,13 @@ export function useTypingEffect({
   }, []);
 
   useEffect(() => {
-    if (!isTyping || indexRef.current >= textToType.length) {
-      if (isTyping) {
-        setIsTyping(false);
-        onFinished?.();
-      }
+    if (!isTyping) {
+      return;
+    }
+    
+    if (indexRef.current >= textToType.length) {
+      setIsTyping(false);
+      onFinished?.();
       return;
     }
 
