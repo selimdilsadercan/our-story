@@ -73,7 +73,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
   const { displayedText, start: startTyping, complete: completeTyping } = useTypingEffect({
     textToType: textToDisplay,
     speed: 35,
-    onCharacterTyped: playSound,
+    onCharacterTyped: isDialogue ? playSound : undefined,
     onFinished: onFinishedTyping,
   });
 
@@ -102,23 +102,18 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
 
   const getPresentCharacters = useCallback((): Character['id'][] => {
     if (item.type === 'dialogue') {
-      // If someone is speaking, they are present.
       const speaker = item.speaker;
       const present: Character['id'][] = [speaker];
 
-      // If a main character is speaking, always show the other one.
       if (speaker === 'selim') {
         present.push('nurmelek');
       } else if (speaker === 'nurmelek') {
         present.push('selim');
       } else if (speaker === 'isil') {
-         // If Isil is speaking, show her with Selim and Nurmelek
         present.push('selim', 'nurmelek');
       }
-      return present;
+      return Array.from(new Set(present));
     }
-
-    // For situations, default to showing the main characters.
     return ['selim', 'nurmelek'];
 
   }, [item]);
