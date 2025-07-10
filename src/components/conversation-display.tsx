@@ -117,10 +117,8 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
       if (item.speaker === 'isil') {
         return ['isil'];
       }
-      // For Selim or Nurmelek speaking, show both.
       return ['selim', 'nurmelek'];
     }
-    // For situations, nobody is shown.
     return [];
   }, [item]);
 
@@ -148,6 +146,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
                   height={200}
                   className="object-contain"
                   data-ai-hint={char.dataAiHint}
+                  priority={true}
                 />
               </div>
             )
