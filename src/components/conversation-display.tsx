@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -38,7 +39,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     return items;
   }, [scene]);
   
-  const currentItem = displayItems[lineIndex];
+  const currentItem = displayItems.length > 0 ? displayItems[lineIndex] : null;
   const isLastLine = lineIndex >= displayItems.length - 1;
   const currentSpeaker = currentItem?.speaker || null;
   const textToDisplay = currentItem?.text || '';
@@ -72,6 +73,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
   // This effect runs when the scene changes. It resets the line index and handles empty scenes.
   useEffect(() => {
     setLineIndex(0);
+    setShowNextButton(false);
     if (displayItems.length === 0) {
       onNextScene();
     }
@@ -127,7 +129,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
         })}
       </div>
       
-      <div onClick={completeTyping} className="cursor-pointer">
+      <div onClick={() => { if (!showNextButton) completeTyping(); }} className="cursor-pointer">
         <Card className="min-h-[180px] flex flex-col justify-between shadow-lg border-2 border-primary/20 bg-card/80 backdrop-blur-sm">
           <CardContent className="p-4 space-y-2">
             {speakerInfo ? (
