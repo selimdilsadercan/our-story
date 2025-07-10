@@ -93,7 +93,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
         narrationSynth = new Tone.Synth({
             oscillator: { type: 'sine' },
             envelope: { attack: 0.001, decay: 0.05, sustain: 0.05, release: 0.1 },
-            volume: -12
+            volume: -6
         }).toDestination();
     }
     if (!achievementPlayer) {
