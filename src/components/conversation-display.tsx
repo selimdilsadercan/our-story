@@ -41,7 +41,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
   const speakerInfo = currentSpeakerId ? characters[currentSpeakerId] : null;
 
   const playAchievementSound = useCallback(() => {
-    if (achievementSoundReady && achievementPlayer && Tone.context.state === 'running') {
+    if (achievementSoundReady && achievementPlayer?.loaded && Tone.context.state === 'running') {
       achievementPlayer.start();
     }
   }, []);
@@ -64,14 +64,10 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
   }, [hasAchievement, achievementText, playAchievementSound, toast]);
 
   const playSound = useCallback(() => {
-    if (!isDialogue && !textToDisplay.includes(' ')) return; // Don't play sound for single word situations like narrator text.
-
-    if (isDialogue || item.type === 'situation') {
-      if (dialogueSynth && Tone.context.state === 'running') {
-        dialogueSynth.triggerAttackRelease('C#5', '32n');
-      }
+    if (dialogueSynth && Tone.context.state === 'running') {
+      dialogueSynth.triggerAttackRelease('C#5', '32n');
     }
-  }, [isDialogue, item.type, textToDisplay]);
+  }, []);
 
   const { displayedText, start: startTyping, complete: completeTyping } = useTypingEffect({
     textToType: textToDisplay,
@@ -102,13 +98,23 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
     
   }, [item, startTyping]);
 
-  const getPresentCharacters = (): Character['id'][] => {
-    if (item.type === 'dialogue') {
-        const otherCharacters = Object.keys(characters).filter(id => id !== item.speaker) as Character['id'][];
-        return [item.speaker, ...otherCharacters.filter(id => item.line.includes(characters[id].name))];
+  const getPresentCharacters = useCallback((): Character['id'][] => {
+    const currentText = item.type === 'dialogue' ? item.line : item.text;
+    const present = Object.keys(characters).filter(id => 
+        currentText.includes(characters[id as Character['id']].name)
+    ) as Character['id'][];
+
+    if (item.type === 'dialogue' && !present.includes(item.speaker)) {
+        present.push(item.speaker);
     }
-    return ['selim', 'nurmelek', 'isil'];
-  };
+    
+    // Default to showing main characters if no one is mentioned
+    if (present.length === 0 && item.type === 'situation') {
+        return ['selim', 'nurmelek'];
+    }
+
+    return present;
+  }, [item]);
 
   const presentCharacters = getPresentCharacters();
 
@@ -122,7 +128,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
             return (
               <div key={char.id} className={cn("transition-all duration-500 ease-in-out absolute bottom-0", 
                   isSpeaking ? "transform scale-110 z-10" : "transform scale-90 opacity-70",
-                  !isPresentInScene && 'opacity-0 scale-50',
+                  !isPresentInScene && 'opacity-0 scale-50 -translate-y-10',
                   char.id === 'selim' && '-translate-x-1/3',
                   char.id === 'nurmelek' && 'translate-x-1/3',
                   char.id === 'isil' && 'translate-x-full'
