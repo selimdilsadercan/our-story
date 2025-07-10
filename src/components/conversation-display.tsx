@@ -36,7 +36,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     } else {
       setLineIndex((prev) => prev + 1);
     }
-  }, [isLastLine, onNextScene, lineIndex]);
+  }, [isLastLine, onNextScene, lineIndex, displayItems.length]);
 
   const onFinishedTyping = useCallback(() => {
     setShowNextButton(true);
@@ -58,11 +58,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     onFinished: onFinishedTyping,
   });
   
-  // Reset line index when scene changes
-  useEffect(() => {
-    setLineIndex(0);
-  }, [scene]);
-
+  // Reset and start typing when scene or lineIndex changes
   useEffect(() => {
     if (!dialogueSynth) {
         dialogueSynth = new Tone.Synth({
@@ -71,10 +67,16 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
         }).toDestination();
     }
     
+    setShowNextButton(false);
     startTyping();
     setCurrentSpeaker(currentItem?.speaker || null);
     
   }, [lineIndex, startTyping, currentItem]);
+
+  // Reset line index when the scene itself changes
+  useEffect(() => {
+    setLineIndex(0);
+  }, [scene]);
 
 
   const speakerInfo = currentItem?.speaker ? characters[currentItem.speaker] : null;
