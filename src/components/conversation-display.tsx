@@ -18,7 +18,7 @@ type ConversationDisplayProps = {
 let dialogueSynth: Tone.Synth;
 
 export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayProps) {
-  const [lineIndex, setLineIndex] = useState(-1); // Start at -1 to show situation first
+  const [lineIndex, setLineIndex] = useState(0); 
   const [showNextButton, setShowNextButton] = useState(false);
   const [currentSpeaker, setCurrentSpeaker] = useState<Dialogue['speaker'] | null>(null);
 
@@ -36,7 +36,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     } else {
       setLineIndex((prev) => prev + 1);
     }
-  }, [isLastLine, onNextScene, lineIndex]);
+  }, [isLastLine, onNextScene]);
 
   const onFinishedTyping = useCallback(() => {
     setShowNextButton(true);
@@ -48,7 +48,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     }
   }, []);
 
-  const currentItem = lineIndex >= 0 ? displayItems[lineIndex] : null;
+  const currentItem = displayItems[lineIndex];
   const textToDisplay = currentItem?.text || '';
 
   const { displayedText, start: startTyping, complete: completeTyping } = useTypingEffect({
@@ -57,6 +57,11 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     onCharacterTyped: playDialogueSound,
     onFinished: onFinishedTyping,
   });
+  
+  // Reset line index when scene changes
+  useEffect(() => {
+    setLineIndex(0);
+  }, [scene]);
 
   useEffect(() => {
     if (!dialogueSynth) {
@@ -65,18 +70,11 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
             envelope: { attack: 0.001, decay: 0.1, sustain: 0.1, release: 0.1 }
         }).toDestination();
     }
-    // Start with the situation
-    if(lineIndex === -1) {
-        setLineIndex(0);
-    }
-  }, [scene]);
-
-  useEffect(() => {
-    if(lineIndex >= 0) {
-        startTyping();
-        setCurrentSpeaker(currentItem?.speaker || null);
-    }
-  }, [lineIndex, startTyping]);
+    
+    startTyping();
+    setCurrentSpeaker(currentItem?.speaker || null);
+    
+  }, [lineIndex, startTyping, currentItem]);
 
 
   const speakerInfo = currentItem?.speaker ? characters[currentItem.speaker] : null;
@@ -90,7 +88,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
             if(!isPresent && lineIndex > 0) return null;
             
             const showCharacter = lineIndex > 0 ? isPresent : false;
-            if(!showCharacter) return null;
+            if(!showCharacter && currentItem.type !== 'dialogue') return null;
 
             return (
               <div key={char.id} className={cn("transition-all duration-300", isSpeaking ? "transform scale-110" : "opacity-70 scale-90")}>
