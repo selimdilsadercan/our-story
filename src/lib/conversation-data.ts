@@ -1,5 +1,5 @@
 export interface Character {
-  id: 'selim' | 'nurmelek' | 'pixelcat';
+  id: 'selim' | 'nurmelek' | 'isil';
   name: string;
   image: string;
   dataAiHint: string;
@@ -28,46 +28,38 @@ export const characters: Record<Character['id'], Character> = {
     image: 'https://placehold.co/200x200.png',
     dataAiHint: 'pixel art girl'
   },
-  pixelcat: {
-    id: 'pixelcat',
-    name: 'Pixel Cat',
-    image: 'https://placehold.co/150x150.png',
-    dataAiHint: 'pixel art cat'
+  isil: {
+    id: 'isil',
+    name: 'Işıl',
+    image: 'https://placehold.co/200x200.png',
+    dataAiHint: 'pixel art friend'
   },
 };
 
 export const conversations: ConversationScene[] = [
   {
-    situation: "A cozy café, rain tapping on the window. Selim and Nurmelek sit across from each other, steaming mugs in hand.",
+    situation: "Yemekhanede, ortak arkadaşları Işıl, Selim ve Nurmelek'i tanıştırır.",
     dialogue: [
-      { speaker: 'selim', line: "You know, this is nice. Just... quiet." },
-      { speaker: 'nurmelek', line: "It is. I was so tired of studying." },
-      { speaker: 'selim', line: "Me too. My brain feels like scrambled eggs." },
-      { speaker: 'nurmelek', line: "Haha, same! Want to share this last cookie? It's chocolate chip." },
-      { speaker: 'selim', line: "Only if I can have the bigger half." },
-      { speaker: 'nurmelek', line: "In your dreams, pixel-head!" },
+      { speaker: 'isil', line: "Selim, bu Nurmelek. Nurmelek, bu da Selim." },
+      { speaker: 'selim', line: "Memnun oldum." },
+      { speaker: 'nurmelek', line: "Ben de memnun oldum." },
+      { speaker: 'isil', line: "Hadi oturun, yemekler soğumasın!" },
     ],
   },
   {
-    situation: "Strolling through a park filled with cherry blossoms. A small, pixelated cat suddenly appears.",
+    situation: "Bir süre sonra, Nurmelek Işıl'dan Selim'in numarasını almıştır. Bir akşam Selim'e mesaj atar.",
     dialogue: [
-      { speaker: 'pixelcat', line: "Mrow?" },
-      { speaker: 'nurmelek', line: "Oh my gosh, look! It's so cute!" },
-      { speaker: 'selim', line: "It looks like it's made of... pixels." },
-      { speaker: 'pixelcat', line: "Meow! Purrrrr..." },
-      { speaker: 'nurmelek', line: "I think it likes you, Selim. It's rubbing against your leg." },
-      { speaker: 'selim', line: "Okay, okay, you're pretty cute for a blocky furball." },
+      { speaker: 'nurmelek', line: "Kanzi, seslide misin? Birlikte ders çalışalım." },
+      { speaker: 'selim', line: "Olur usta, gel çalışalım." },
     ],
   },
   {
-    situation: "Under a sky full of stars, on Valentine's Day.",
+    situation: "Birlikte ders çalışırken Selim, uzmanlık alanı olan logaritma sorularında takılır.",
     dialogue: [
-      { speaker: 'selim', line: "Nurmelek..." },
-      { speaker: 'nurmelek', line: "Selim?" },
-      { speaker: 'selim', line: "I... I have something for you." },
-      { speaker: 'nurmelek', line: "You do?" },
-      { speaker: 'selim', line: "This whole adventure, every pixel of it, has been better with you. I love you." },
-      { speaker: 'nurmelek', line: "Oh, Selim... I love you too. Happy Valentine's Day." },
+      { speaker: 'selim', line: "Kahretsin, halledemedim şu soruları..." },
+      { speaker: 'nurmelek', line: "Dur, bir de ben bakayım. Hah, bak şöyle yapacaksın..." },
+      { speaker: 'selim', line: "Vay, helal olsun! Çözdün valla." },
+      { speaker: 'nurmelek', line: "Ne sandın? ;) " },
     ],
   },
 ];
