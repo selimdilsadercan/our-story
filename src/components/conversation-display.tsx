@@ -39,13 +39,11 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     return items;
   }, [scene]);
   
-  const currentItem = displayItems.length > 0 ? displayItems[lineIndex] : null;
+  const currentItem = displayItems[lineIndex];
   const isLastLine = lineIndex >= displayItems.length - 1;
-  const currentSpeaker = currentItem?.speaker || null;
   const textToDisplay = currentItem?.text || '';
 
   const handleNext = useCallback(() => {
-    setShowNextButton(false);
     if (isLastLine) {
       onNextScene();
     } else {
@@ -73,11 +71,10 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
   // This effect runs when the scene changes. It resets the line index and handles empty scenes.
   useEffect(() => {
     setLineIndex(0);
-    setShowNextButton(false);
     if (displayItems.length === 0) {
       onNextScene();
     }
-  }, [scene, displayItems, onNextScene]);
+  }, [scene, displayItems.length, onNextScene]);
   
   // This effect runs when the line index changes (or the scene changes, causing the line to change).
   // It starts the typing animation for the new line.
@@ -104,18 +101,23 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     return null; // Don't render anything if there's no item to display
   }
 
+  const currentSpeaker = currentItem?.speaker || null;
+
   return (
     <div className="w-full h-full flex flex-col p-4 animate-fade-in">
       <div className="relative flex-1 flex items-center justify-around min-h-[200px]">
         {Object.values(characters).map((char) => {
             const isSpeaking = char.id === currentSpeaker;
-            const isPresent = scene.dialogue.some(d => d.speaker === char.id);
-            if(!isPresent && currentItem?.type === 'dialogue') return null;
+            const isPresent = scene.dialogue?.some(d => d.speaker === char.id) ?? false;
             
-            const showCharacter = currentItem?.type === 'dialogue';
+            // Only show characters if it's a dialogue scene and they are part of it.
+            const showCharacter = currentItem?.type === 'dialogue' && isPresent;
 
             return (
-              <div key={char.id} className={cn("transition-all duration-300", isSpeaking ? "transform scale-110" : "opacity-70 scale-90", showCharacter ? 'opacity-100' : 'opacity-0')}>
+              <div key={char.id} className={cn("transition-all duration-300", 
+                  isSpeaking ? "transform scale-110" : "opacity-70 scale-90", 
+                  showCharacter ? 'opacity-100' : 'opacity-0'
+              )}>
                 <Image
                   src={char.image}
                   alt={char.name}
@@ -138,7 +140,7 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
                 <p className="text-foreground text-lg leading-snug font-body h-16">{displayedText}</p>
               </>
             ) : (
-                <p className="italic text-muted-foreground text-lg leading-snug font-body h-24">{displayedText}</p>
+                <p className="italic text-muted-foreground text-lg leading-snug font-body h-24 p-4">{displayedText}</p>
             )}
           </CardContent>
           {showNextButton && (
