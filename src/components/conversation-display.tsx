@@ -21,6 +21,7 @@ type ConversationDisplayProps = {
 };
 
 let dialogueSynth: Tone.Synth;
+let narrationSynth: Tone.Synth;
 let achievementPlayer: Tone.Player;
 let achievementSoundReady = false;
 
@@ -65,15 +66,19 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
   }, [hasAchievement, achievementText, playAchievementSound, toast]);
 
   const playSound = useCallback(() => {
-    if (dialogueSynth && Tone.context.state === 'running') {
+    if (Tone.context.state !== 'running') return;
+    
+    if (isDialogue && dialogueSynth) {
       dialogueSynth.triggerAttackRelease('C#5', '32n');
+    } else if (!isDialogue && narrationSynth) {
+      narrationSynth.triggerAttackRelease('C2', '32n');
     }
-  }, []);
+  }, [isDialogue]);
 
   const { displayedText, start: startTyping, complete: completeTyping } = useTypingEffect({
     textToType: textToDisplay,
     speed: 35,
-    onCharacterTyped: isDialogue ? playSound : undefined,
+    onCharacterTyped: playSound,
     onFinished: onFinishedTyping,
   });
 
@@ -82,6 +87,13 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
         dialogueSynth = new Tone.Synth({
             oscillator: { type: 'square' },
             envelope: { attack: 0.001, decay: 0.1, sustain: 0.1, release: 0.1 }
+        }).toDestination();
+    }
+    if (!narrationSynth) {
+        narrationSynth = new Tone.Synth({
+            oscillator: { type: 'sine' },
+            envelope: { attack: 0.001, decay: 0.05, sustain: 0.05, release: 0.1 },
+            volume: -12
         }).toDestination();
     }
     if (!achievementPlayer) {
@@ -102,15 +114,17 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
 
   const getPresentCharacters = useCallback((): Character['id'][] => {
     if (item.type === 'dialogue') {
-      const speaker = item.speaker;
-      const present: Character['id'][] = [speaker];
-
-      if (speaker === 'selim') {
+      const present: Character['id'][] = [item.speaker];
+       if (item.speaker === 'selim' && item.line.toLowerCase().includes('nurmelek')) {
         present.push('nurmelek');
-      } else if (speaker === 'nurmelek') {
+      } else if (item.speaker === 'nurmelek' && item.line.toLowerCase().includes('selim')) {
         present.push('selim');
-      } else if (speaker === 'isil') {
+      } else if (item.speaker !== 'selim' && item.speaker !== 'nurmelek') {
         present.push('selim', 'nurmelek');
+      } else if (item.speaker === 'selim') {
+        present.push('nurmelek');
+      } else if (item.speaker === 'nurmelek') {
+        present.push('selim');
       }
       return Array.from(new Set(present));
     }
