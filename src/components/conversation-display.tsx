@@ -15,15 +15,20 @@ type ConversationDisplayProps = {
   onNextScene: () => void;
 };
 
+type DisplayItem = {
+    type: 'situation' | 'dialogue';
+    text: string;
+    speaker: Dialogue['speaker'] | null;
+};
+
 let dialogueSynth: Tone.Synth;
 
 export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayProps) {
   const [lineIndex, setLineIndex] = useState(0); 
   const [showNextButton, setShowNextButton] = useState(false);
-  const [currentSpeaker, setCurrentSpeaker] = useState<Dialogue['speaker'] | null>(null);
 
-  const displayItems = React.useMemo(() => {
-    const items = [];
+  const displayItems = React.useMemo<DisplayItem[]>(() => {
+    const items: DisplayItem[] = [];
     if (scene.situation) {
         items.push({ type: 'situation', text: scene.situation, speaker: null });
     }
@@ -33,7 +38,10 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     return items;
   }, [scene]);
   
+  const currentItem = displayItems[lineIndex];
   const isLastLine = lineIndex >= displayItems.length - 1;
+  const currentSpeaker = currentItem?.speaker || null;
+  const textToDisplay = currentItem?.text || '';
 
   const handleNext = useCallback(() => {
     setShowNextButton(false);
@@ -42,25 +50,17 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     } else {
       setLineIndex((prev) => prev + 1);
     }
-  }, [isLastLine, onNextScene, lineIndex, displayItems.length]);
+  }, [isLastLine, onNextScene, lineIndex]);
 
   const onFinishedTyping = useCallback(() => {
-    if (displayItems.length > 0) {
-      setShowNextButton(true);
-    } else {
-      // If there are no items to display, move to the next scene automatically.
-      onNextScene();
-    }
-  }, [displayItems.length, onNextScene]);
-
-  const playDialogueSound = useCallback(() => {
-    if (dialogueSynth && Tone.context.state === 'running') {
-      dialogueSynth.triggerAttackRelease('C#5', '32n');
-    }
+    setShowNextButton(true);
   }, []);
 
-  const currentItem = displayItems[lineIndex];
-  const textToDisplay = currentItem?.text || '';
+  const playDialogueSound = useCallback(() => {
+    if (dialogueSynth && Tone.context.state === 'running' && currentItem?.type === 'dialogue') {
+      dialogueSynth.triggerAttackRelease('C#5', '32n');
+    }
+  }, [currentItem]);
 
   const { displayedText, start: startTyping, complete: completeTyping } = useTypingEffect({
     textToType: textToDisplay,
@@ -68,8 +68,17 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     onCharacterTyped: playDialogueSound,
     onFinished: onFinishedTyping,
   });
+
+  // This effect runs when the scene changes. It resets the line index and handles empty scenes.
+  useEffect(() => {
+    setLineIndex(0);
+    if (displayItems.length === 0) {
+      onNextScene();
+    }
+  }, [scene, displayItems, onNextScene]);
   
-  // Reset and start typing when scene or lineIndex changes
+  // This effect runs when the line index changes (or the scene changes, causing the line to change).
+  // It starts the typing animation for the new line.
   useEffect(() => {
     if (!dialogueSynth) {
         dialogueSynth = new Tone.Synth({
@@ -79,28 +88,18 @@ export function ConversationDisplay({ scene, onNextScene }: ConversationDisplayP
     }
     
     setShowNextButton(false);
-    startTyping();
-    setCurrentSpeaker(currentItem?.speaker || null);
-    
-  }, [lineIndex, startTyping, currentItem]);
 
-  // Reset line index when the scene itself changes
-  useEffect(() => {
-    setLineIndex(0);
-  }, [scene]);
-
-  // Handle scenes with no text content
-  useEffect(() => {
-    if (displayItems.length === 0) {
-      onNextScene();
+    if(currentItem) {
+        startTyping();
     }
-  }, [displayItems, onNextScene]);
+    
+  }, [currentItem, startTyping]);
 
 
   const speakerInfo = currentItem?.speaker ? characters[currentItem.speaker] : null;
 
-  if (displayItems.length === 0) {
-    return null; // Don't render anything if the scene is empty
+  if (!currentItem) {
+    return null; // Don't render anything if there's no item to display
   }
 
   return (
