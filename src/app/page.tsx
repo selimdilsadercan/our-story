@@ -3,13 +3,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import * as Tone from 'tone';
 import { ConversationDisplay } from '@/components/conversation-display';
-import { ConversationEditor } from '@/components/conversation-editor';
 import { conversations } from '@/lib/conversation-data';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Heart, Music, BookOpen, Code, Volume2, VolumeX } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Heart, Music, Volume2, VolumeX } from 'lucide-react';
 
-type GameState = 'intro' | 'playing' | 'editor' | 'end';
+type GameState = 'intro' | 'playing' | 'end';
 
 export default function Home() {
   const [gameState, setGameState] = useState<GameState>('intro');
@@ -78,8 +77,6 @@ export default function Home() {
         );
       case 'playing':
         return <ConversationDisplay scene={conversations[currentSceneIndex]} onNextScene={handleNextScene} />;
-      case 'editor':
-        return <ConversationEditor />;
       case 'end':
         return (
           <Card className="text-center p-8 flex flex-col items-center gap-6 animate-fade-in shadow-xl border-2 border-primary/20">
@@ -97,11 +94,6 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gradient-to-br from-background to-secondary font-body">
       <div className="fixed top-4 right-4 z-10 flex gap-2">
-        {gameState !== 'intro' && (
-             <Button variant="outline" size="icon" onClick={() => setGameState(gameState === 'editor' ? (currentSceneIndex >= conversations.length ? 'end' : 'playing') : 'editor')}>
-                {gameState === 'editor' ? <BookOpen/> : <Code/>}
-            </Button>
-        )}
         {audioReady && (
             <Button variant="outline" size="icon" onClick={toggleMute}>
                 {musicMuted ? <VolumeX /> : <Volume2 />}
