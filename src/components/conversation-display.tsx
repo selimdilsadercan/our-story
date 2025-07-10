@@ -90,6 +90,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
         onload: () => {
           achievementSoundReady = true;
         },
+        onerror: (err) => console.error("Audio player error:", err),
       }).toDestination();
     }
     
@@ -99,21 +100,27 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
   }, [item, startTyping]);
 
   const getPresentCharacters = useCallback((): Character['id'][] => {
-    const currentText = item.type === 'dialogue' ? item.line : item.text;
-    const present = Object.keys(characters).filter(id => 
-        currentText.includes(characters[id as Character['id']].name)
-    ) as Character['id'][];
+    if (item.type === 'dialogue') {
+      // If someone is speaking, they are present.
+      // If the other main character is mentioned, show them too.
+      // Otherwise, just show the speaker and the other main character.
+      const speaker = item.speaker;
+      const otherMain = speaker === 'selim' ? 'nurmelek' : 'selim';
+      const present: Character['id'][] = [speaker];
 
-    if (item.type === 'dialogue' && !present.includes(item.speaker)) {
-        present.push(item.speaker);
-    }
-    
-    // Default to showing main characters if no one is mentioned
-    if (present.length === 0 && item.type === 'situation') {
-        return ['selim', 'nurmelek'];
+      // If Işıl is speaking, show her with Selim and Nurmelek
+      if (speaker === 'isil') {
+        present.push('selim', 'nurmelek');
+      } else {
+         // If a main character is speaking, always show the other one.
+        present.push(otherMain);
+      }
+      return present;
     }
 
-    return present;
+    // For situations, default to showing the main characters.
+    return ['selim', 'nurmelek'];
+
   }, [item]);
 
   const presentCharacters = getPresentCharacters();
