@@ -11,16 +11,12 @@ import { Heart, Music, Volume2, VolumeX } from 'lucide-react';
 type GameState = 'intro' | 'playing' | 'end';
 
 export default function Home() {
-  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [gameState, setGameState] = useState<GameState>('intro');
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [audioReady, setAudioReady] = useState(false);
   const [musicMuted, setMusicMuted] = useState(false);
 
   const musicLoop = useRef<Tone.Loop | null>(null);
-
-  useEffect(() => {
-    setGameState('intro');
-  }, []);
 
   const handleStart = useCallback(async () => {
     if (audioReady) {
