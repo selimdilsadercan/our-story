@@ -140,7 +140,7 @@ export function ConversationDisplay({ item, onNext, onBack, canGoBack }: Convers
                   char.id === 'isil' && 'translate-x-0' // Centered when alone
               )}>
                 <Image
-                  src={"/" + char.id + ".png"}
+                  src={char.image}
                   alt={char.name}
                   width={200}
                   height={200}
