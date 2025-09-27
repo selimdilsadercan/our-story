@@ -24,14 +24,14 @@ export const characters: Record<Character['id'], Character> = {
   selim: {
     id: 'selim',
     name: 'Selim',
-    image: '/selim.png',
+    image: '/selimnew.png',
     dataAiHint: 'man with glasses',
     color: '#3b82f6'
   },
   nurmelek: {
     id: 'nurmelek',
     name: 'Nurmelek',
-    image: '/nurmelek.png',
+    image: '/nurmeleknew.png',
     dataAiHint: 'girl with brown hair',
     color: '#e879f9'
   },
@@ -53,7 +53,8 @@ export const conversationTimeline: ConversationItem[] = [
     { type: 'dialogue', speaker: 'selim', line: "Halledemedim şu soruları." },
     { type: 'dialogue', speaker: 'nurmelek', line: "Bak şöyle yapıcan." },
     { type: 'situation', text: "Nurmelek, Selim'in soruları çözmesine yardımcı olur, birlikte ders çalışmaya devam ederler." },
-    { type: 'situation', text: "Vize zamanı birlikte ders çalışırlar sürekli." },
+    { type: 'situation', text: "Ara tatilde eve gitmeden önce Nurmelek ekip içinde boş olan varsa bi çay içmek istediğini söyler, Selim o sıra boştur ve ikisi birlikte Selfiş'te güzel bir zaman geçirirler. Başarım: İlk baş başa muhabbetler!" },
+    { type: 'situation', text: "Tailden döndükten sonra vize zamanı birlikte ders çalışırlar sürekli." },
     { type: 'situation', text: "Ders aralarında ve diğer zamanlarda sık sık zaman geçirirler, yemekhaneye hep birlikte giderler, çayı hep birlikte içerler." },
     { type: 'dialogue', speaker: 'nurmelek', line: "Senle güzel çalışabiliyoruz he, ekipte en iyi ders çalışan sen olabilirsin." },
     { type: 'situation', text: "Final zamanı birlikte ders çalışmaya devam ederler." },
@@ -68,6 +69,8 @@ export const conversationTimeline: ConversationItem[] = [
     { type: 'situation', text: "İkisinin de yurda döndüğü bir gün WhatsApp'tan birbirlerine en sevdikleri şarkıları atarlar, tüm gece birbirleriyle konuşurlar." },
     { type: 'situation', text: "Selim'in takım sunumu sonrası Nurmelek, Selim ve İlayda birlikte bira içmeye gider, yolda Selim İlayda'nın yanına oturunca Nurmelek kıskanır. Başarım: İlk kıskanma!" },
     { type: 'situation', text: "Selim, Nurmelek'i date için kahvaltıcıya götürür, birbirlerini tanımaya yönelik sorular sorarlar, güzel zaman geçirirler. Başarım: İlk date!" },
+    { type: 'situation', text: "Bu date'den sonra Nurmelek Selim'den biraz uzaklaşmaya çalışmaktadır, araları biraz soğuk geçer." },
+    { type: 'situation', text: "Bir gün Selim yemek yemeye selfişe gidecekken Nurmelek Selim'e yaptığı rus salatasının kaldığını söyler ve yemesi için ona ikram eder. Başarım: Yapılan ilk yemek!" },
     { type: 'situation', text: "Final zamanı birlikte ders çalışmaya devam ederler. Selim Nurmelek'le tekrar dışarı çıkmak ister." },
     { type: 'dialogue', speaker: 'selim', line: "Bi dışarı çıkmayalım mı?" },
     { type: 'dialogue', speaker: 'nurmelek', line: "2 sınavdan çıktım yorgunum, başka zaman yaparız." },
@@ -104,7 +107,7 @@ export const conversationTimeline: ConversationItem[] = [
     { type: 'situation', text: "Yer değiştirirler, bankta sarılarak oturmaya devam ederler. Gün doğduktan sonra yurtlara dağılmaya karar verirler. Dönüşte Selim, Nurmelek'e masa tenisi oynamayı teklif eder, biraz da orada zaman geçirirler." },
     { type: 'situation', text: "Ramazan boyunca birlikte zaman geçirirler her gece birlikte sahur yaparlar. Sahuru beklerken Selim'in kitap okuduğu, Nurmelek'in de gözlerini dinlendirdiği bir gün, Nurmelek yanlışlıkla gaz çıkartır. Başarım: İlk gaz çıkarma!" },
     { type: 'situation', text: "Tekrar gün doğumunu izlemeye gölete gittikleri bir gün gölet evine çıkarlar. Orada oturur, genel muhabbet ederler. Nurmelek daha fazla ileri gitmemeye çalışmak adına uyarmak ister." },
-    { type: 'dialogue', speaker: 'nurmelek', line: "Arkadaşız" },
+    { type: 'dialogue', speaker: 'nurmelek', line: "Arkadaşız.. 🫴" },
     { type: 'dialogue', speaker: 'selim', line: "?₺!\"+#!?#!_#" },
     { type: 'situation', text: "Garip bir durum oluşmuştur. Biraz daha otururlar, geri dönmeye karar verip inerlerken arı kovanlarının olduğu yerde de biraz oturmaya karar verirler." },
     { type: 'situation', text: "Selim artık bu garip durumdan sıkılmıştır. Nurmelek'in tam olarak neler hissettiğini anlamak için direkt duygularını sormaya başlar." },
@@ -133,5 +136,5 @@ export const conversationTimeline: ConversationItem[] = [
     { type: 'situation', text: "Selim yalnız dönmemesi için Nurmelek'in yanına gitmiştir. Nurmelek'in arkadaşları dönerler, Selim ve Nurmelek önce o mekanda sonra başka yerde biraz daha içerler. Bira içerler, sarılırlar." },
     { type: 'situation', text: "Selim'in sürekli olarak yaptığı tatlı davranışlar, onu bırakmaması ve bir sorun olduğunda barışmak için çabaladığını gören Nurmelek, Selim'i sevdiğinden artık emin olmuştur ve sevgili olmaya karar vermiştir." },
     { type: 'dialogue', speaker: 'nurmelek', line: "Öpsene beni." },
-    { type: 'situation', text: "İlk öpüşme ve artık sevgili olmayı başarmışlardır... To be continued..." }
+    { type: 'situation', text: "İlk öpüşme ve artık sevgili olmayı başarmışlardır... To be continued... Başarım: Sevgili olmayı başarma!" }
 ];

@@ -63,7 +63,7 @@ export default function Home() {
             <h1 className="text-4xl font-headline text-primary">Seni Seviyorum Aşkim ❤️</h1>
             <div className="flex gap-4">
                <Button onClick={handlePreviousItem} size="lg" variant="outline">Geri Dön</Button>
-               <Button onClick={() => { setCurrentItemIndex(0); setGameState('playing'); }} size="lg">Hikayeyi Tekrar Oynat</Button>
+               <Button onClick={() => { setCurrentItemIndex(0); setGameState('playing'); }} size="lg">Tekrar Oynat</Button>
             </div>
           </Card>
         );
